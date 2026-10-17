@@ -52,8 +52,6 @@ def download_mp3(url, output_folder="downloads"):
         'outtmpl': f'{output_folder}/%(title)s.%(ext)s', 
         'quiet': True,
         'no_warnings': True,
-        'extractor_args': {
-            'youtube': ['player_client=ios,tv']
         }
     }
     
