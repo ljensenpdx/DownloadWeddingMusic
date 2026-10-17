@@ -1,5 +1,5 @@
 fastapi
 uvicorn
 PyMuPDF
-yt-dlp
+https://github.com/yt-dlp/yt-dlp/archive/refs/heads/master.zip
 python-multipart
