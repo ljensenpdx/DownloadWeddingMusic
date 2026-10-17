@@ -43,7 +43,6 @@ def extract_youtube_links(pdf_path):
 
 def download_mp3(url, output_folder="downloads"):
     ydl_opts = {
-        # More forgiving format selector to catch mobile audio streams
         'format': 'm4a/bestaudio/best',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
@@ -53,9 +52,11 @@ def download_mp3(url, output_folder="downloads"):
         'outtmpl': f'{output_folder}/%(title)s.%(ext)s', 
         'quiet': True,
         'no_warnings': True,
-        # Chain multiple clients: Android usually bypasses the bot block AND the music DRM block
         'extractor_args': {
-            'youtube': ['client=android,ios,tv,web']
+            'youtube': ['player_client=mweb,default']
+        },
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
         }
     }
     
