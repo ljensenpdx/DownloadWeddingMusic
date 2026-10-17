@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to MP3 Converter</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        .upload-box { border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        button { background: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0052a3; }
+        button:disabled { background: #cccccc; cursor: not-allowed; }
+        #status { font-weight: bold; margin-top: 20px; color: #333; }
+        .result-item { padding: 10px; background: #f9f9f9; border-left: 4px solid #4CAF50; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;}
+        .result-item.failed { border-left-color: #f44336; }
+    </style>
+</head>
+<body>
+
+    <h1>PDF to MP3 Converter</h1>
+    <p>Upload a PDF containing YouTube links. We will extract them in order, download them, and convert them to MP3.</p>
+
+    <div class="upload-box">
+        <input type="file" id="pdfFile" accept="application/pdf">
+        <br><br>
+        <button id="uploadBtn" onclick="uploadPDF()">Process PDF</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="results"></div>
+
+    <script>
+        async function uploadPDF() {
+            const fileInput = document.getElementById('pdfFile');
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            const btn = document.getElementById('uploadBtn');
+
+            if (!fileInput.files[0]) {
+                alert("Please select a PDF file first.");
+                return;
+            }
+
+            // Reset UI
+            btn.disabled = true;
+            statusDiv.innerText = "Processing... This will take a few minutes depending on the video lengths.";
+            resultsDiv.innerHTML = "";
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/upload-pdf/', { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                statusDiv.innerText = data.message;
+                
+                data.ordered_downloads.forEach(dl => {
+                    const div = document.createElement('div');
+                    if (dl.status === 'success') {
+                        const fileName = dl.file_path.split('/').pop(); // Extract just the filename
+                        div.className = "result-item";
+                        div.innerHTML = `
+                            <span>🎵 ${dl.title}</span>
+                            <a href="/download/${encodeURIComponent(fileName)}" download>
+                                <button style="background: #4CAF50; padding: 5px 10px; font-size: 14px;">Download MP3</button>
+                            </a>
+                        `;
+                    } else {
+                        div.className = "result-item failed";
+                        div.innerHTML = `<span>❌ Failed: ${dl.url} (${dl.error})</span>`;
+                    }
+                    resultsDiv.appendChild(div);
+                });
+            } catch (error) {
+                statusDiv.innerText = "An error occurred during processing.";
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
