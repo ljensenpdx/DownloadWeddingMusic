@@ -53,6 +53,10 @@ def download_mp3(url, output_folder="downloads"):
         'quiet': True,
         'no_warnings': True
     }
+    
+    # Check if the secret cookie file exists, and use it if it does
+    if os.path.exists("cookies.txt"):
+        ydl_opts['cookiefile'] = 'cookies.txt'
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
