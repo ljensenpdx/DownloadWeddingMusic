@@ -57,10 +57,12 @@ def download_mp3(url, output_folder="downloads"):
         }
     }
     
-    # NEW LOGIC: Check Render's secure Docker path first, then check locally
+    # NEW LOGIC: Copy the read-only secret to a writable temporary directory
     if os.path.exists("/etc/secrets/cookies.txt"):
-        ydl_opts['cookiefile'] = '/etc/secrets/cookies.txt'
-        print("Using Render secret cookies!") # Helps with debugging
+        writable_cookie_path = "/tmp/cookies.txt"
+        shutil.copyfile("/etc/secrets/cookies.txt", writable_cookie_path)
+        ydl_opts['cookiefile'] = writable_cookie_path
+        print("Using Render secret cookies (copied to writable path)!")
     elif os.path.exists("cookies.txt"):
         ydl_opts['cookiefile'] = 'cookies.txt'
         print("Using local cookies!")
