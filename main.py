@@ -41,6 +41,7 @@ def extract_youtube_links(pdf_path):
 
     return yt_links
 
+Python
 def download_mp3(url, output_folder="downloads"):
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -51,7 +52,12 @@ def download_mp3(url, output_folder="downloads"):
         }],
         'outtmpl': f'{output_folder}/%(title)s.%(ext)s', 
         'quiet': True,
-        'no_warnings': True
+        'no_warnings': True,
+        
+        # Add this new block right here:
+        'extractor_args': {
+            'youtube': ['player_client=ios,tv']
+        }
     }
     
     # Check if the secret cookie file exists, and use it if it does
