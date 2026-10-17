@@ -41,7 +41,6 @@ def extract_youtube_links(pdf_path):
 
     return yt_links
 
-Python
 def download_mp3(url, output_folder="downloads"):
     ydl_opts = {
         'format': 'bestaudio/best',
