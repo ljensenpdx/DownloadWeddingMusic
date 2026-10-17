@@ -1,0 +1,6 @@
+Plaintext
+fastapi
+uvicorn
+PyMuPDF
+yt-dlp
+python-multipart
