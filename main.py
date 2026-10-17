@@ -51,11 +51,9 @@ def download_mp3(url, output_folder="downloads"):
         }],
         'outtmpl': f'{output_folder}/%(title)s.%(ext)s', 
         'quiet': True,
-        'no_warnings': True,
-        }
+        'no_warnings': True
     }
     
-    # NEW LOGIC: Copy the read-only secret to a writable temporary directory
     if os.path.exists("/etc/secrets/cookies.txt"):
         writable_cookie_path = "/tmp/cookies.txt"
         shutil.copyfile("/etc/secrets/cookies.txt", writable_cookie_path)
