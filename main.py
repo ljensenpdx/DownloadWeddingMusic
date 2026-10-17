@@ -52,21 +52,22 @@ def download_mp3(url, output_folder="downloads"):
         'outtmpl': f'{output_folder}/%(title)s.%(ext)s', 
         'quiet': True,
         'no_warnings': True,
-        
-        # Add this new block right here:
         'extractor_args': {
             'youtube': ['player_client=ios,tv']
         }
     }
     
-    # Check if the secret cookie file exists, and use it if it does
-    if os.path.exists("cookies.txt"):
+    # NEW LOGIC: Check Render's secure Docker path first, then check locally
+    if os.path.exists("/etc/secrets/cookies.txt"):
+        ydl_opts['cookiefile'] = '/etc/secrets/cookies.txt'
+        print("Using Render secret cookies!") # Helps with debugging
+    elif os.path.exists("cookies.txt"):
         ydl_opts['cookiefile'] = 'cookies.txt'
+        print("Using local cookies!")
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
-            # yt-dlp might download a .webm or .m4a before converting to .mp3
             filename = ydl.prepare_filename(info)
             base_name = os.path.splitext(filename)[0]
             mp3_filename = f"{base_name}.mp3"
@@ -74,6 +75,7 @@ def download_mp3(url, output_folder="downloads"):
             return {"url": url, "title": info.get('title'), "file_path": mp3_filename, "status": "success"}
     except Exception as e:
         return {"url": url, "status": "failed", "error": str(e)}
+
 
 @app.post("/upload-pdf/")
 async def upload_pdf(file: UploadFile = File(...)):
